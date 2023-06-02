@@ -1,5 +1,5 @@
 
-const {NotImplementedError} = require('../extensions/index.js');
+const { NotImplementedError } = require('../extensions/index.js');
 
 // const {Node} = require('../extensions/list-tree.js');
 
@@ -22,110 +22,80 @@ class BinarySearchTree {
     this.rootNode = null
   }
 
-
-  root() {
-    return this.rootNode
-  }
-
-  add(data) {
-    let newNode = new Node(data)
-    if (this.rootNode === null) {
-      this.rootNode = newNode
+  #insertNode(node, newNode) {
+    if (newNode.data < node.data) {
+      node.left ? this.#insertNode(node.left, newNode) : node.left = newNode
     } else {
-      insertNode(this.rootNode, newNode)
-    }
-
-    function insertNode(node, newNode) {
-      if (newNode.data < node.data) {
-        if (node.left === null) {
-          node.left = newNode
-        } else {
-          insertNode(node.left, newNode)
-        }
-      } else {
-        if (node.right === null) {
-          node.right = newNode
-        } else {
-          insertNode(node.right, newNode)
-        }
-      }
+      node.right ? this.#insertNode(node.right, newNode) : node.right = newNode
     }
   }
 
-  has(data) {
-    if (this.find(data) !== null) {
-      return true
-    }
-    return false
+  #search(node, data) {
+    if (node === null) return null
+    if (data < node.data) return this.#search(node.left, data)
+    if (data > node.data) return this.#search(node.right, data)
+    return node
   }
 
-  find(data) {
-    let node = this.rootNode
-    return search(node, data)
-
-    function search(node, data) {
-      if (node === null) return null
-      if (data < node.data) return search(node.left, data)
-      if (data > node.data) return search(node.right, data)
-      return node
-    }
-  }
-
-  min() {
-    let node = this.rootNode
-    return this.findMin(node).data
-  }
-
-  findMin(node) {
+  #findMin(node) {
     if (node === null) return null
     if (node.left === null) return node
-    return this.findMin(node.left)
+    return this.#findMin(node.left)
   }
 
-  max() {
-    let node = this.rootNode
-    return this.findMax(node).data
-  }
-
-  findMax(node) {
+  #findMax(node) {
     if (node === null) return null
     if (node.right === null) return node
-    return this.findMax(node.right)
+    return this.#findMax(node.right)
   }
 
-  remove(data) {
-    this.rootNode = this.removeNode(this.rootNode, data)
-  }
-
-  removeNode(node, data) {
-    if (node === null) return null
+  #removeNode(node, data) {
     if (data < node.data) {
-      node.left = this.removeNode(node.left, data)
+      node.left = this.#removeNode(node.left, data)
       return node
     }
+
     if (data > node.data) {
-      node.right = this.removeNode(node.right, data)
+      node.right = this.#removeNode(node.right, data)
       return node
     }
 
     if (node.left === null && node.right === null) {
-      node = null
-      return node
-    }
-    if (node.left === null) {
-      node = node.right
-      return node
-    }
-    if (node.right === null) {
-      node = node.left
-      return node
+      return null
     }
 
-    let newNode = this.findMin(node.right)
+    if (node.left === null) {
+      return node.right
+    }
+
+    if (node.right === null) {
+      return node.left
+    }
+
+    const newNode = this.#findMin(node.right)
     node.data = newNode.data
-    node.right = this.removeNode(node.right, newNode.data)
+    node.right = this.#removeNode(node.right, node.data)
 
     return node
+  }
+
+  root = () => this.rootNode
+
+  has = (data) => this.find(data) ? true : false
+
+  find = (data) => this.#search(this.rootNode, data)
+
+  min = () => this.#findMin(this.rootNode).data
+
+  max = () => this.#findMax(this.rootNode).data
+
+  add = (data) => {
+    const newNode = new Node(data)
+    this.rootNode ? this.#insertNode(this.rootNode, newNode) : this.rootNode = newNode
+  }
+
+  remove = (data) => {
+    this.rootNode = this.#removeNode(this.rootNode, data)
   }
 }
 
